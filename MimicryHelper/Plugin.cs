@@ -2,49 +2,66 @@
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
+using Dalamud.Game.ClientState;
 using System.Reflection;
+
+// TODO: - interface in the PluginUI
+// concrete here
+// inject into PluginUI 
+// concrete takes in PluginInterface, shouldn't need CommandManager since it's just to bring up the menu
+// show 3 buttons in the UI
+// define enum for roles
+// interface is for a func that lets us target a character whose current job matches button role
 
 namespace MimicryHelper
 {
+    public sealed class Dalamud
+    {
+        public static void Initialize(DalamudPluginInterface pluginInterface) => pluginInterface.Create<Dalamud>();
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static CommandManager Commands { get; private set; } = null!;
+    }
+
     public sealed class Plugin : IDalamudPlugin
     {
         public string Name => "Sample Plugin";
 
         private const string commandName = "/pmycommand";
 
-        private DalamudPluginInterface PluginInterface { get; init; }
-        private CommandManager CommandManager { get; init; }
         private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
 
-        public Plugin(
-            [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
-            [RequiredVersion("1.0")] CommandManager commandManager)
+        public Plugin(DalamudPluginInterface pluginInterface)
         {
-            this.PluginInterface = pluginInterface;
-            this.CommandManager = commandManager;
+            Dalamud.Initialize(pluginInterface);
 
-            this.Configuration = this.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(this.PluginInterface);
+            this.Configuration = Dalamud.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            this.Configuration.Initialize(Dalamud.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = this.PluginInterface.UiBuilder.LoadImage(imagePath);
+            var imagePath = Path.Combine(Dalamud.PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
+            var goatImage = Dalamud.PluginInterface.UiBuilder.LoadImage(imagePath);
             this.PluginUi = new PluginUI(this.Configuration, goatImage);
 
-            this.CommandManager.AddHandler(commandName, new CommandInfo(OnCommand)
+            Dalamud.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "A useful message to display in /xlhelp"
             });
 
-            this.PluginInterface.UiBuilder.Draw += DrawUI;
-            this.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            Dalamud.PluginInterface.UiBuilder.Draw += DrawUI;
+            Dalamud.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
         }
 
         public void Dispose()
         {
             this.PluginUi.Dispose();
-            this.CommandManager.RemoveHandler(commandName);
+            Dalamud.Commands.RemoveHandler(commandName);
         }
 
         private void OnCommand(string command, string args)
