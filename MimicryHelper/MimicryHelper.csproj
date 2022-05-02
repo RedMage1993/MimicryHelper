@@ -6,7 +6,7 @@
     <Version>0.0.0.1</Version>
     <Description>A sample plugin.</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/RedMage1993/MimicryHelper</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="SamplePlugin.json">
+    <Content Include="MimicryHelper.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="..\Data\goat.png">
