@@ -7,18 +7,18 @@ using System.Numerics;
 
 namespace MimicryHelper
 {
-    public enum MimicryRole { Tank = 1, MeleeDps = 2, RangedDps = 3, Healer = 4 };
+    
 
     public interface IMimicryMaster
     {
         const uint AethericMimicryActionID = 18322;
 
-        void MimicRole(List<MimicryRole> mimicryRoleList);
+        void MimicRole(IMimicryRole mimicryRole);
     }
 
     public sealed unsafe class Gogo : IMimicryMaster
     {
-        private static List<PlayerCharacter> PlayerCharactersMatchingRole(MimicryRole mimicryRole)
+        private static List<PlayerCharacter> PlayerCharactersMatchingRole(MimicryRoleKind mimicryRoleKind)
         {
             var playerCharactersMatchingRole = new List<PlayerCharacter>();
 
@@ -30,7 +30,7 @@ namespace MimicryHelper
                     continue;
                 }
 
-                if (playerCharacter.ClassJob.GameData?.Role == (byte)mimicryRole)
+                if (playerCharacter.ClassJob.GameData?.Role == (byte) mimicryRoleKind)
                 {
                     playerCharactersMatchingRole.Add((gameObject as PlayerCharacter)!);
                 }
@@ -78,12 +78,12 @@ namespace MimicryHelper
             return closestPlayer;
         }
 
-        public void MimicRole(List<MimicryRole> mimicryRoleList)
+        public void MimicRole(IMimicryRole mimicryRole)
         {
             var playerCharactersMatchingRole = new List<PlayerCharacter>();
-            foreach (MimicryRole mimicryRole in mimicryRoleList)
+            foreach (MimicryRoleKind mimicryRoleKind in mimicryRole.RoleKinds)
             {
-                playerCharactersMatchingRole.AddRange(PlayerCharactersMatchingRole(mimicryRole));
+                playerCharactersMatchingRole.AddRange(PlayerCharactersMatchingRole(mimicryRoleKind));
             }
 
             var closestPlayer = ClosestToLocalPlayer(playerCharactersMatchingRole);

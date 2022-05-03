@@ -74,11 +74,11 @@ namespace MimicryHelper
 
         private void OnCommand(string command, string args)
         {
-            var roleMap = new Dictionary<string, List<MimicryRole>>()
+            var roleMap = new Dictionary<string, IMimicryRole>()
             {
-                { "t", new() { MimicryRole.Tank } },
-                { "d", new() { MimicryRole.MeleeDps, MimicryRole.RangedDps } },
-                { "h", new() { MimicryRole.Healer } }
+                { "t", new TankMimicryRole() },
+                { "d", new DpsMimicryRole() },
+                { "h", new HealerMimicryRole() }
             };
 
             if (roleMap.ContainsKey(args))

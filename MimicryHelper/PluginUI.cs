@@ -72,21 +72,21 @@ namespace MimicryHelper
             {
                 if (ImGui.Button("Mimic Tank", new Vector2(UIButtonWidth, UIButtonHeight)))
                 {
-                    mimicryMaster.MimicRole(new() { MimicryRole.Tank });
+                    mimicryMaster.MimicRole(new TankMimicryRole());
                 }
 
                 ImGui.SameLine();
 
                 if (ImGui.Button("Mimic DPS", new Vector2(UIButtonWidth, UIButtonHeight)))
                 {
-                    mimicryMaster.MimicRole(new() { MimicryRole.MeleeDps, MimicryRole.RangedDps });
+                    mimicryMaster.MimicRole(new DpsMimicryRole());
                 }
 
                 ImGui.SameLine();
 
                 if (ImGui.Button("Mimic Heal", new Vector2(UIButtonWidth, UIButtonHeight)))
                 {
-                    mimicryMaster.MimicRole(new() { MimicryRole.Healer });
+                    mimicryMaster.MimicRole(new HealerMimicryRole());
                 }
             }
             ImGui.End();
