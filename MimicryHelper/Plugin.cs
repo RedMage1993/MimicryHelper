@@ -41,7 +41,7 @@ namespace MimicryHelper
 
         private const string commandName = "/mimic";
 
-        //private Configuration Configuration { get; init; }
+        private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
 
 #if DEBUG
@@ -54,11 +54,11 @@ namespace MimicryHelper
         {
             Services.Initialize(pluginInterface);
 
-            //this.Configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            //this.Configuration.Initialize(Services.PluginInterface);
+            this.Configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            this.Configuration.Initialize(Services.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            this.PluginUi = new PluginUI();// this.Configuration);
+            this.PluginUi = new PluginUI(this.Configuration);
 
             Services.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
             {
@@ -66,7 +66,7 @@ namespace MimicryHelper
             });
 
             Services.PluginInterface.UiBuilder.Draw += DrawUI;
-            Services.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            //Services.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
 
 #if DEBUG

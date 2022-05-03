@@ -11,7 +11,7 @@ namespace MimicryHelper
     // to do any cleanup
     unsafe class PluginUI : IDisposable
     {
-        //private Configuration configuration;
+        private Configuration configuration;
 
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
@@ -29,9 +29,9 @@ namespace MimicryHelper
         }
 
         // passing in the image here just for simplicity
-        public PluginUI()//Configuration configuration)
+        public PluginUI(Configuration configuration)
         {
-            //this.configuration = configuration;
+            this.configuration = configuration;
         }
 
         public void Dispose()
