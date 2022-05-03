@@ -1,6 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace MimicryHelper
 {
@@ -15,17 +18,65 @@ namespace MimicryHelper
 
     public sealed unsafe class Gogo : MimicryMaster
     {
-        public void MimicRole(MimicryRole mimicryRole)
+        private List<PlayerCharacter> PlayerCharactersMatchingRole(MimicryRole mimicryRole)
         {
+            var playerCharactersMatchingRole = new List<PlayerCharacter>();
+
             foreach (GameObject gameObject in Services.Objects)
             {
-                if ((gameObject as PlayerCharacter)?.ClassJob.GameData?.Role == (byte) mimicryRole)
+                if ((gameObject as PlayerCharacter)?.ClassJob.GameData?.Role == (byte)mimicryRole)
                 {
-                    Services.Chat.Print($"Attempting to mimic {gameObject.Name}...");
-                    ActionManager.Instance()->UseAction(ActionType.Spell, MimicryMaster.AethericMimicryActionID, gameObject.ObjectId);
-                    break;
+                    playerCharactersMatchingRole.Add((gameObject as PlayerCharacter)!);
                 }
             }
+
+            return playerCharactersMatchingRole;
+        }
+
+        private static double GetDistance(double x1, double y1, double x2, double y2)
+        {
+            return Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
+        }
+
+        private PlayerCharacter? ClosestToLocalPlayer(List<PlayerCharacter> playerCharacters)
+        {
+            PlayerCharacter? closestPlayer = null;
+
+            Vector3? myPosition = Services.ClientState.LocalPlayer?.Position;
+
+            if (myPosition == null)
+            {
+                return null;
+            }
+
+            double smallestDistanceSoFar = -1;
+
+            foreach (PlayerCharacter playerCharacter in playerCharacters)
+            {
+                var distance = GetDistance(playerCharacter.Position.X, playerCharacter.Position.Y, myPosition.Value.X, myPosition.Value.Y);
+
+                if (distance < smallestDistanceSoFar || smallestDistanceSoFar < 0)
+                {
+                    smallestDistanceSoFar = distance;
+                    closestPlayer = playerCharacter;
+                }
+            }
+
+            return closestPlayer;
+        }
+
+        public void MimicRole(MimicryRole mimicryRole)
+        {
+            var closestPlayer = ClosestToLocalPlayer(PlayerCharactersMatchingRole(mimicryRole));
+
+            if (closestPlayer == null)
+            {
+                Services.Chat.Print("Could not find a character to mimic.");
+                return;
+            }
+
+            Services.Chat.Print($"Attempting to mimic {closestPlayer.Name}...");
+            ActionManager.Instance()->UseAction(ActionType.Spell, MimicryMaster.AethericMimicryActionID, closestPlayer.ObjectId);
         }
     }
 }

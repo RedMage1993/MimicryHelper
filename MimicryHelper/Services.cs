@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.Gui;
 using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Game.Command;
@@ -21,6 +22,10 @@ namespace MimicryHelper
         [PluginService]
         [RequiredVersion("1.0")]
         public static ObjectTable Objects { get; private set; } = null!;
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static ClientState ClientState { get; private set; } = null!;
 
         [PluginService]
         [RequiredVersion("1.0")]
