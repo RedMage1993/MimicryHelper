@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using FFXIVClientStructs.FFXIV.Client.Game;
+using ImGuiNET;
 using System;
 using System.Numerics;
 
@@ -6,7 +7,7 @@ namespace MimicryHelper
 {
     // It is good to have this be disposable in general, in case you ever need it
     // to do any cleanup
-    class PluginUI : IDisposable
+    unsafe class PluginUI : IDisposable
     {
         private Configuration configuration;
 
@@ -68,6 +69,10 @@ namespace MimicryHelper
                 if (ImGui.Button("Show Settings"))
                 {
                     SettingsVisible = true;
+
+                    const uint AethericMimicryActionID = 18322;
+
+                    ActionManager.Instance()->UseAction(ActionType.Spell, AethericMimicryActionID, 276706138);
                 }
 
                 ImGui.Spacing();

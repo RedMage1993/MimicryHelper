@@ -1,9 +1,13 @@
 ﻿using Dalamud.Game.Command;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.Gui;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Hooking;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using System.IO;
-using Dalamud.Game.ClientState;
-using System.Reflection;
+using System;
+using Dalamud.Logging;
 
 // TODO: - interface in the PluginUI
 // concrete here
@@ -26,9 +30,21 @@ namespace MimicryHelper
         [PluginService]
         [RequiredVersion("1.0")]
         public static CommandManager Commands { get; private set; } = null!;
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static ObjectTable Objects { get; private set; } = null!;
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static TargetManager Targets { get; private set; } = null!;
+
+        [PluginService]
+        [RequiredVersion("1.0")]
+        public static ChatGui Chat { get; private set; } = null!;
     }
 
-    public sealed class Plugin : IDalamudPlugin
+    public sealed unsafe class Plugin : IDalamudPlugin
     {
         public string Name => "Sample Plugin";
 
@@ -36,6 +52,10 @@ namespace MimicryHelper
 
         private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
+
+        private delegate IntPtr UseActionDelegate(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7);
+
+        private readonly Hook<UseActionDelegate>? useActionHook;
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
@@ -56,10 +76,27 @@ namespace MimicryHelper
 
             Dalamud.PluginInterface.UiBuilder.Draw += DrawUI;
             Dalamud.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+
+            
+            try
+            {
+                useActionHook = new Hook<UseActionDelegate>((IntPtr)ActionManager.fpUseAction, UseActionDetour);
+                useActionHook.Enable();
+                #if DEBUG
+                {
+                    PluginLog.Log("GOOD");
+                }
+                #endif
+            }
+            catch (Exception e)
+            {
+                PluginLog.Log("Error:\n" + e);
+            }
         }
 
         public void Dispose()
         {
+            useActionHook?.Dispose();
             this.PluginUi.Dispose();
             Dalamud.Commands.RemoveHandler(commandName);
         }
@@ -78,6 +115,13 @@ namespace MimicryHelper
         private void DrawConfigUI()
         {
             this.PluginUi.SettingsVisible = true;
+        }
+
+        private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7)
+        {
+            Dalamud.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, a4 = {a4}, a5 = {a5}, a6 = {a6}, a7 = {new IntPtr(a7):X}");
+
+            return useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
         }
     }
 }
