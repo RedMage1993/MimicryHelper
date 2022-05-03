@@ -19,9 +19,9 @@ using Dalamud.Logging;
 
 namespace MimicryHelper
 {
-    public sealed class Dalamud
+    public sealed class Services
     {
-        public static void Initialize(DalamudPluginInterface pluginInterface) => pluginInterface.Create<Dalamud>();
+        public static void Initialize(DalamudPluginInterface pluginInterface) => pluginInterface.Create<Services>();
 
         [PluginService]
         [RequiredVersion("1.0")]
@@ -59,23 +59,23 @@ namespace MimicryHelper
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
-            Dalamud.Initialize(pluginInterface);
+            Services.Initialize(pluginInterface);
 
-            this.Configuration = Dalamud.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(Dalamud.PluginInterface);
+            this.Configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            this.Configuration.Initialize(Services.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(Dalamud.PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = Dalamud.PluginInterface.UiBuilder.LoadImage(imagePath);
+            var imagePath = Path.Combine(Services.PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
+            var goatImage = Services.PluginInterface.UiBuilder.LoadImage(imagePath);
             this.PluginUi = new PluginUI(this.Configuration, goatImage);
 
-            Dalamud.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
+            Services.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
             {
                 HelpMessage = "A useful message to display in /xlhelp"
             });
 
-            Dalamud.PluginInterface.UiBuilder.Draw += DrawUI;
-            Dalamud.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+            Services.PluginInterface.UiBuilder.Draw += DrawUI;
+            Services.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
             
             try
@@ -98,7 +98,7 @@ namespace MimicryHelper
         {
             useActionHook?.Dispose();
             this.PluginUi.Dispose();
-            Dalamud.Commands.RemoveHandler(commandName);
+            Services.Commands.RemoveHandler(commandName);
         }
 
         private void OnCommand(string command, string args)
@@ -119,7 +119,7 @@ namespace MimicryHelper
 
         private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7)
         {
-            Dalamud.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, a4 = {a4}, a5 = {a5}, a6 = {a6}, a7 = {new IntPtr(a7):X}");
+            Services.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, a4 = {a4}, a5 = {a5}, a6 = {a6}, a7 = {new IntPtr(a7):X}");
 
             return useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
         }

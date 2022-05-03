@@ -1,4 +1,6 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -66,13 +68,29 @@ namespace MimicryHelper
             {
                 ImGui.Text($"The random config bool is {this.configuration.SomePropertyToBeSavedAndWithADefault}");
 
-                if (ImGui.Button("Show Settings"))
+                if (ImGui.Button("Mimic Tank"))
                 {
-                    SettingsVisible = true;
+                    //SettingsVisible = true;
 
+
+
+                    //Services.Chat.Print($"{(Services.Objects[0] as PlayerCharacter)?.ClassJob.GameData?.Role.ToString()  ?? "Empty"}");
+                    // TANK = 1
+                    // HEALER = 4
+                    // LIMITED DPS = 3
+                    // DPS = 2
+                    // Craft = 0
                     const uint AethericMimicryActionID = 18322;
 
-                    ActionManager.Instance()->UseAction(ActionType.Spell, AethericMimicryActionID, 276706138);
+                    foreach (GameObject gameObject in Services.Objects)
+                    {
+                        if ((gameObject as PlayerCharacter)?.ClassJob.GameData?.Role == 1)
+                        {
+                            Services.Chat.Print($"Attempting to mimick {gameObject.Name}...");
+                            ActionManager.Instance()->UseAction(ActionType.Spell, AethericMimicryActionID, gameObject.ObjectId);
+                            break;
+                        }
+                    }
                 }
 
                 ImGui.Spacing();
