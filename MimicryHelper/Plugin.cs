@@ -1,17 +1,22 @@
-﻿using Dalamud.Game.Command;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.Command;
+using Dalamud.Hooking;
+using Dalamud.Logging;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using System;
 using System.Collections.Generic;
 
 namespace MimicryHelper
 {
-    public sealed class Plugin : IDalamudPlugin
+    public sealed unsafe class Plugin : IDalamudPlugin
     {
         public string Name => "Mimicry Helper";
 
         private const string commandName = "/mimic";
 
         private Configuration Configuration { get; init; }
-        private MimicryMaster MimicryMaster { get; init; }
+        private IMimicryMaster MimicryMaster { get; init; }
         private PluginUI PluginUi { get; init; }
 
         
@@ -69,11 +74,11 @@ namespace MimicryHelper
 
         private void OnCommand(string command, string args)
         {
-            var roleMap = new Dictionary<string, MimicryRole>()
+            var roleMap = new Dictionary<string, List<MimicryRole>>()
             {
-                { "t", MimicryRole.Tank },
-                { "h", MimicryRole.Healer },
-                { "d", MimicryRole.Dps }
+                { "t", new() { MimicryRole.Tank } },
+                { "d", new() { MimicryRole.MeleeDps, MimicryRole.RangedDps } },
+                { "h", new() { MimicryRole.Healer } }
             };
 
             if (roleMap.ContainsKey(args))
@@ -92,15 +97,20 @@ namespace MimicryHelper
             this.PluginUi.Draw();
         }
 
-        private void DrawConfigUI()
-        {
-            this.PluginUi.SettingsVisible = true;
-        }
+        //private void DrawConfigUI()
+        //{
+        //    this.PluginUi.SettingsVisible = true;
+        //}
 
 #if DEBUG
         private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7)
         {
-            Services.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, a4 = {a4}, a5 = {a5}, a6 = {a6}, a7 = {new IntPtr(a7):X}");
+            PlayerCharacter? playerCharacter = Services.Objects.SearchById((uint) targetID) as PlayerCharacter;
+
+            if (playerCharacter != null)
+            {
+                Services.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, role = {playerCharacter.ClassJob.GameData?.Role.ToString() ?? "?"}");
+            }
 
             return useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
         }

@@ -15,9 +15,9 @@ namespace MimicryHelper
         const float UIButtonWidth = 100;
         const float UIButtonHeight = 25;
 
-        private Configuration configuration;
+        private readonly Configuration configuration;
 
-        private MimicryMaster mimicryMaster;
+        private readonly IMimicryMaster mimicryMaster;
 
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
@@ -35,7 +35,7 @@ namespace MimicryHelper
         }
 
         // passing in the image here just for simplicity
-        public PluginUI(Configuration configuration, MimicryMaster mimicryMaster)
+        public PluginUI(Configuration configuration, IMimicryMaster mimicryMaster)
         {
             this.configuration = configuration;
             this.mimicryMaster = mimicryMaster;
@@ -72,21 +72,21 @@ namespace MimicryHelper
             {
                 if (ImGui.Button("Mimic Tank", new Vector2(UIButtonWidth, UIButtonHeight)))
                 {
-                    mimicryMaster.MimicRole(MimicryRole.Tank);
-                }
-
-                ImGui.SameLine();
-
-                if (ImGui.Button("Mimic Heal", new Vector2(UIButtonWidth, UIButtonHeight)))
-                {
-                    mimicryMaster.MimicRole(MimicryRole.Healer);
+                    mimicryMaster.MimicRole(new() { MimicryRole.Tank });
                 }
 
                 ImGui.SameLine();
 
                 if (ImGui.Button("Mimic DPS", new Vector2(UIButtonWidth, UIButtonHeight)))
                 {
-                    mimicryMaster.MimicRole(MimicryRole.Dps);
+                    mimicryMaster.MimicRole(new() { MimicryRole.MeleeDps, MimicryRole.RangedDps });
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Mimic Heal", new Vector2(UIButtonWidth, UIButtonHeight)))
+                {
+                    mimicryMaster.MimicRole(new() { MimicryRole.Healer });
                 }
             }
             ImGui.End();

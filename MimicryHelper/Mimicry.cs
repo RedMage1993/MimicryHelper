@@ -7,24 +7,30 @@ using System.Numerics;
 
 namespace MimicryHelper
 {
-    public enum MimicryRole { Tank = 1, Healer = 4, Dps = 2 };
+    public enum MimicryRole { Tank = 1, MeleeDps = 2, RangedDps = 3, Healer = 4 };
 
-    public interface MimicryMaster
+    public interface IMimicryMaster
     {
         const uint AethericMimicryActionID = 18322;
 
-        void MimicRole(MimicryRole mimicryRole);
+        void MimicRole(List<MimicryRole> mimicryRoleList);
     }
 
-    public sealed unsafe class Gogo : MimicryMaster
+    public sealed unsafe class Gogo : IMimicryMaster
     {
-        private List<PlayerCharacter> PlayerCharactersMatchingRole(MimicryRole mimicryRole)
+        private static List<PlayerCharacter> PlayerCharactersMatchingRole(MimicryRole mimicryRole)
         {
             var playerCharactersMatchingRole = new List<PlayerCharacter>();
 
             foreach (GameObject gameObject in Services.Objects)
             {
-                if ((gameObject as PlayerCharacter)?.ClassJob.GameData?.Role == (byte)mimicryRole)
+                PlayerCharacter? playerCharacter = gameObject as PlayerCharacter;
+
+                if (playerCharacter == null || playerCharacter == Services.ClientState.LocalPlayer) {
+                    continue;
+                }
+
+                if (playerCharacter.ClassJob.GameData?.Role == (byte)mimicryRole)
                 {
                     playerCharactersMatchingRole.Add((gameObject as PlayerCharacter)!);
                 }
@@ -38,7 +44,7 @@ namespace MimicryHelper
             return Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
         }
 
-        private PlayerCharacter? ClosestToLocalPlayer(List<PlayerCharacter> playerCharacters)
+        private static PlayerCharacter? ClosestToLocalPlayer(List<PlayerCharacter> playerCharacters)
         {
             PlayerCharacter? closestPlayer = null;
 
@@ -62,12 +68,25 @@ namespace MimicryHelper
                 }
             }
 
+#if DEBUG
+            if (closestPlayer != null)
+            {
+                Services.Chat.Print($"Found {closestPlayer.Name} at ({closestPlayer.Position.X}, {closestPlayer.Position.Y}) while you're at ({myPosition.Value.X}, {myPosition.Value.Y}), making distance = {smallestDistanceSoFar}...");
+            }
+#endif
+
             return closestPlayer;
         }
 
-        public void MimicRole(MimicryRole mimicryRole)
+        public void MimicRole(List<MimicryRole> mimicryRoleList)
         {
-            var closestPlayer = ClosestToLocalPlayer(PlayerCharactersMatchingRole(mimicryRole));
+            var playerCharactersMatchingRole = new List<PlayerCharacter>();
+            foreach (MimicryRole mimicryRole in mimicryRoleList)
+            {
+                playerCharactersMatchingRole.AddRange(PlayerCharactersMatchingRole(mimicryRole));
+            }
+
+            var closestPlayer = ClosestToLocalPlayer(playerCharactersMatchingRole);
 
             if (closestPlayer == null)
             {
@@ -76,7 +95,7 @@ namespace MimicryHelper
             }
 
             Services.Chat.Print($"Attempting to mimic {closestPlayer.Name}...");
-            ActionManager.Instance()->UseAction(ActionType.Spell, MimicryMaster.AethericMimicryActionID, closestPlayer.ObjectId);
+            ActionManager.Instance()->UseAction(ActionType.Spell, IMimicryMaster.AethericMimicryActionID, closestPlayer.ObjectId);
         }
     }
 }
