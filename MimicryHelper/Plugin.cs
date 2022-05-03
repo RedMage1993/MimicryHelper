@@ -37,10 +37,6 @@ namespace MimicryHelper
 
         [PluginService]
         [RequiredVersion("1.0")]
-        public static TargetManager Targets { get; private set; } = null!;
-
-        [PluginService]
-        [RequiredVersion("1.0")]
         public static ChatGui Chat { get; private set; } = null!;
     }
 
