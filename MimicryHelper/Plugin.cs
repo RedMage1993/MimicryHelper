@@ -49,9 +49,11 @@ namespace MimicryHelper
         private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
 
+#if DEBUG
         private delegate IntPtr UseActionDelegate(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7);
 
         private readonly Hook<UseActionDelegate>? useActionHook;
+#endif
 
         public Plugin(DalamudPluginInterface pluginInterface)
         {
@@ -73,26 +75,27 @@ namespace MimicryHelper
             Services.PluginInterface.UiBuilder.Draw += DrawUI;
             Services.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
 
-            
+
+#if DEBUG
             try
             {
                 useActionHook = new Hook<UseActionDelegate>((IntPtr)ActionManager.fpUseAction, UseActionDetour);
                 useActionHook.Enable();
-                #if DEBUG
-                {
-                    PluginLog.Log("GOOD");
-                }
-                #endif
+
+                PluginLog.Log("Success");
             }
             catch (Exception e)
             {
                 PluginLog.Log("Error:\n" + e);
             }
+#endif
         }
 
         public void Dispose()
         {
+#if DEBUG
             useActionHook?.Dispose();
+#endif
             this.PluginUi.Dispose();
             Services.Commands.RemoveHandler(commandName);
         }
@@ -113,11 +116,13 @@ namespace MimicryHelper
             this.PluginUi.SettingsVisible = true;
         }
 
+#if DEBUG
         private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7)
         {
             Services.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, a4 = {a4}, a5 = {a5}, a6 = {a6}, a7 = {new IntPtr(a7):X}");
 
             return useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
         }
+#endif
     }
 }
