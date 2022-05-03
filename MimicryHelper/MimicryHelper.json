@@ -1,13 +1,14 @@
 {
-  "Author": "your name here",
-  "Name": "Sample Plugin",
-  "Punchline": "A short one-liner that shows up in /xlplugins.",
-  "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
+  "Author": "RedMage1993",
+  "Name": "Mimicry Helper",
+  "Punchline": "Automatically mimic the role you're looking for.",
+  "Description": "Use /mimic to open up the menu and click on the appropriate button to automatically mimic the role you're looking for.",
   "InternalName": "mimicryHelper",
   "ApplicableVersion": "any",
   "Tags": [
-    "sample",
-    "plugin",
-    "goats"
-  ]
+    "blue mage",
+    "blu",
+    "mimicry"
+  ],
+  "RepoUrl": "https://github.com/RedMage1993/MimicryHelper"
 }

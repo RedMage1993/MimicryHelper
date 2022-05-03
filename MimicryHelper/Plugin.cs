@@ -3,11 +3,6 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Gui;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using Dalamud.Hooking;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using System.IO;
-using System;
-using Dalamud.Logging;
 
 // TODO: - interface in the PluginUI
 // concrete here
@@ -42,11 +37,11 @@ namespace MimicryHelper
 
     public sealed unsafe class Plugin : IDalamudPlugin
     {
-        public string Name => "Sample Plugin";
+        public string Name => "Mimicry Helper";
 
         private const string commandName = "/mimic";
 
-        private Configuration Configuration { get; init; }
+        //private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
 
 #if DEBUG
@@ -59,17 +54,15 @@ namespace MimicryHelper
         {
             Services.Initialize(pluginInterface);
 
-            this.Configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-            this.Configuration.Initialize(Services.PluginInterface);
+            //this.Configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+            //this.Configuration.Initialize(Services.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            var imagePath = Path.Combine(Services.PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-            var goatImage = Services.PluginInterface.UiBuilder.LoadImage(imagePath);
-            this.PluginUi = new PluginUI(this.Configuration, goatImage);
+            this.PluginUi = new PluginUI();// this.Configuration);
 
             Services.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "A useful message to display in /xlhelp"
+                HelpMessage = "Bring up the main menu with buttons for Tank, Healer, and DPS roles."
             });
 
             Services.PluginInterface.UiBuilder.Draw += DrawUI;
