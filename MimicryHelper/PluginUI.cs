@@ -1,6 +1,4 @@
-﻿using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using FFXIVClientStructs.FFXIV.Client.Game;
+﻿
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -9,9 +7,17 @@ namespace MimicryHelper
 {
     // It is good to have this be disposable in general, in case you ever need it
     // to do any cleanup
-    unsafe class PluginUI : IDisposable
+    class PluginUI : IDisposable
     {
+        const float UIWidth = 350;
+        const float UIHeight = 75;
+
+        const float UIButtonWidth = 100;
+        const float UIButtonHeight = 25;
+
         private Configuration configuration;
+
+        private MimicryMaster mimicryMaster;
 
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
@@ -29,9 +35,10 @@ namespace MimicryHelper
         }
 
         // passing in the image here just for simplicity
-        public PluginUI(Configuration configuration)
+        public PluginUI(Configuration configuration, MimicryMaster mimicryMaster)
         {
             this.configuration = configuration;
+            this.mimicryMaster = mimicryMaster;
         }
 
         public void Dispose()
@@ -48,7 +55,7 @@ namespace MimicryHelper
             // draw delegates as low as possible.
 
             DrawMainWindow();
-            DrawSettingsWindow();
+            //DrawSettingsWindow();
         }
 
         public void DrawMainWindow()
@@ -58,33 +65,28 @@ namespace MimicryHelper
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(375, 330), ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSizeConstraints(new Vector2(375, 330), new Vector2(float.MaxValue, float.MaxValue));
-            if (ImGui.Begin("My Amazing Window", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            ImGui.SetNextWindowSize(new Vector2(UIWidth, UIHeight), ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSizeConstraints(new Vector2(UIWidth, UIHeight), new Vector2(UIWidth, UIHeight));
+
+            if (ImGui.Begin("Mimicry Helper", ref this.visible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                if (ImGui.Button("Mimic Tank"))
+                if (ImGui.Button("Mimic Tank", new Vector2(UIButtonWidth, UIButtonHeight)))
                 {
-                    //SettingsVisible = true;
+                    mimicryMaster.MimicRole(MimicryRole.Tank);
+                }
 
+                ImGui.SameLine();
 
+                if (ImGui.Button("Mimic Heal", new Vector2(UIButtonWidth, UIButtonHeight)))
+                {
+                    mimicryMaster.MimicRole(MimicryRole.Healer);
+                }
 
-                    //Services.Chat.Print($"{(Services.Objects[0] as PlayerCharacter)?.ClassJob.GameData?.Role.ToString()  ?? "Empty"}");
-                    // TANK = 1
-                    // HEALER = 4
-                    // LIMITED DPS = 3
-                    // DPS = 2
-                    // Craft = 0
-                    const uint AethericMimicryActionID = 18322;
+                ImGui.SameLine();
 
-                    foreach (GameObject gameObject in Services.Objects)
-                    {
-                        if ((gameObject as PlayerCharacter)?.ClassJob.GameData?.Role == 1)
-                        {
-                            Services.Chat.Print($"Attempting to mimick {gameObject.Name}...");
-                            ActionManager.Instance()->UseAction(ActionType.Spell, AethericMimicryActionID, gameObject.ObjectId);
-                            break;
-                        }
-                    }
+                if (ImGui.Button("Mimic DPS", new Vector2(UIButtonWidth, UIButtonHeight)))
+                {
+                    mimicryMaster.MimicRole(MimicryRole.Dps);
                 }
             }
             ImGui.End();
@@ -104,7 +106,7 @@ namespace MimicryHelper
                 // make configuration here (reference git history or SamplePlugin for original example)
 
                 // can save immediately on change, if you don't want to provide a "Save and Close" button
-                //this.configuration.Save();
+                this.configuration.Save();
             }
             ImGui.End();
         }

@@ -1,41 +1,9 @@
 ﻿using Dalamud.Game.Command;
-using Dalamud.Game.ClientState.Objects;
-using Dalamud.Game.Gui;
-using Dalamud.IoC;
 using Dalamud.Plugin;
-
-// TODO: - interface in the PluginUI
-// concrete here
-// inject into PluginUI 
-// concrete takes in PluginInterface, shouldn't need CommandManager since it's just to bring up the menu
-// show 3 buttons in the UI
-// define enum for roles
-// interface is for a func that lets us target a character whose current job matches button role
 
 namespace MimicryHelper
 {
-    public sealed class Services
-    {
-        public static void Initialize(DalamudPluginInterface pluginInterface) => pluginInterface.Create<Services>();
-
-        [PluginService]
-        [RequiredVersion("1.0")]
-        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
-
-        [PluginService]
-        [RequiredVersion("1.0")]
-        public static CommandManager Commands { get; private set; } = null!;
-
-        [PluginService]
-        [RequiredVersion("1.0")]
-        public static ObjectTable Objects { get; private set; } = null!;
-
-        [PluginService]
-        [RequiredVersion("1.0")]
-        public static ChatGui Chat { get; private set; } = null!;
-    }
-
-    public sealed unsafe class Plugin : IDalamudPlugin
+    public sealed class Plugin : IDalamudPlugin
     {
         public string Name => "Mimicry Helper";
 
@@ -58,7 +26,7 @@ namespace MimicryHelper
             this.Configuration.Initialize(Services.PluginInterface);
 
             // you might normally want to embed resources and load them from the manifest stream
-            this.PluginUi = new PluginUI(this.Configuration);
+            this.PluginUi = new PluginUI(this.Configuration, new Gogo());
 
             Services.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
             {
