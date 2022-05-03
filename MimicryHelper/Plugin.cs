@@ -48,7 +48,7 @@ namespace MimicryHelper
     {
         public string Name => "Sample Plugin";
 
-        private const string commandName = "/pmycommand";
+        private const string commandName = "/mimic";
 
         private Configuration Configuration { get; init; }
         private PluginUI PluginUi { get; init; }
