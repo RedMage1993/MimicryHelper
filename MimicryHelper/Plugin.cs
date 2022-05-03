@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.Command;
 using Dalamud.Plugin;
+using System.Collections.Generic;
 
 namespace MimicryHelper
 {
@@ -10,7 +11,10 @@ namespace MimicryHelper
         private const string commandName = "/mimic";
 
         private Configuration Configuration { get; init; }
+        private MimicryMaster MimicryMaster { get; init; }
         private PluginUI PluginUi { get; init; }
+
+        
 
 #if DEBUG
         private delegate IntPtr UseActionDelegate(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7);
@@ -25,12 +29,14 @@ namespace MimicryHelper
             this.Configuration = Services.PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
             this.Configuration.Initialize(Services.PluginInterface);
 
+            this.MimicryMaster = new Gogo();
+
             // you might normally want to embed resources and load them from the manifest stream
-            this.PluginUi = new PluginUI(this.Configuration, new Gogo());
+            this.PluginUi = new PluginUI(this.Configuration, MimicryMaster);
 
             Services.Commands.AddHandler(commandName, new CommandInfo(OnCommand)
             {
-                HelpMessage = "Bring up the main menu with buttons for Tank, Healer, and DPS roles."
+                HelpMessage = "Bring up the main menu with buttons for Tank, Healer, and DPS roles. You can specify the first letter of the role as an argument (e.g. /mimic t)."
             });
 
             Services.PluginInterface.UiBuilder.Draw += DrawUI;
@@ -63,8 +69,22 @@ namespace MimicryHelper
 
         private void OnCommand(string command, string args)
         {
-            // in response to the slash command, just display our main ui
-            this.PluginUi.Visible = true;
+            var roleMap = new Dictionary<string, MimicryRole>()
+            {
+                { "t", MimicryRole.Tank },
+                { "h", MimicryRole.Healer },
+                { "d", MimicryRole.Dps }
+            };
+
+            if (roleMap.ContainsKey(args))
+            {
+                MimicryMaster.MimicRole(roleMap[args]);  
+            }
+            else
+            {
+                // in response to the slash command, just display our main ui
+                this.PluginUi.Visible = !this.PluginUi.Visible;
+            }
         }
 
         private void DrawUI()
