@@ -108,7 +108,7 @@ namespace MimicryHelper
 
             double relativeDirectionDegrees = GetRelativeDirectionDegrees(myPosition.Value.X, myPosition.Value.Z, character.Position.X, character.Position.Z);
 
-            return CompassDirections[(int) Math.Round(relativeDirectionDegrees / CompassDirectionPieceDegrees)];
+            return CompassDirections[((int) Math.Round(relativeDirectionDegrees / CompassDirectionPieceDegrees)) % CompassDirections.Length];
         }
 
         public void MimicRole(IMimicryRole mimicryRole)
