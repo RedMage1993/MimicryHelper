@@ -7,8 +7,6 @@ using System.Numerics;
 
 namespace MimicryHelper
 {
-    
-
     public interface IMimicryMaster
     {
         const uint AethericMimicryActionID = 18322;
