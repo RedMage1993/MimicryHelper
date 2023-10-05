@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState;
 using Dalamud.IoC;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using Dalamud.Game.Command;
 
 namespace MimicryHelper
@@ -17,18 +18,18 @@ namespace MimicryHelper
 
         [PluginService]
         [RequiredVersion("1.0")]
-        public static CommandManager Commands { get; private set; } = null!;
+        public static ICommandManager Commands { get; private set; } = null!;
 
         [PluginService]
         [RequiredVersion("1.0")]
-        public static ObjectTable Objects { get; private set; } = null!;
+        public static IObjectTable Objects { get; private set; } = null!;
 
         [PluginService]
         [RequiredVersion("1.0")]
-        public static ClientState ClientState { get; private set; } = null!;
+        public static IClientState ClientState { get; private set; } = null!;
 
         [PluginService]
         [RequiredVersion("1.0")]
-        public static ChatGui Chat { get; private set; } = null!;
+        public static IChatGui Chat { get; private set; } = null!;
     }
 }

@@ -128,7 +128,7 @@ namespace MimicryHelper
             }
 
             Services.Chat.Print($"Attempting to mimic {closestPlayer.Name} in the {GetRelativeCompassDirection(closestPlayer)} direction...");
-            ActionManager.Instance()->UseAction(ActionType.Spell, IMimicryMaster.AethericMimicryActionID, closestPlayer.ObjectId);
+            ActionManager.Instance()->UseAction(ActionType.Action, IMimicryMaster.AethericMimicryActionID, closestPlayer.ObjectId);
         }
     }
 }
