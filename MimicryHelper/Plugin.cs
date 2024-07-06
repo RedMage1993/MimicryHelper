@@ -27,7 +27,7 @@ namespace MimicryHelper
         private readonly Hook<UseActionDelegate>? useActionHook;
 #endif
 
-        public Plugin(DalamudPluginInterface pluginInterface)
+        public Plugin(IDalamudPluginInterface pluginInterface)
         {
             Services.Initialize(pluginInterface);
 
@@ -105,7 +105,7 @@ namespace MimicryHelper
 #if DEBUG
         private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7)
         {
-            PlayerCharacter? playerCharacter = Services.Objects.SearchById((uint) targetID) as PlayerCharacter;
+            IPlayerCharacter? playerCharacter = Services.Objects.SearchById((uint) targetID) as IPlayerCharacter;
 
             if (playerCharacter != null)
             {

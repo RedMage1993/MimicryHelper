@@ -19,13 +19,13 @@ namespace MimicryHelper
         private static readonly string[] CompassDirections = { "eastern", "northeastern", "northern", "northwestern", "western", "southwestern", "southern", "southeastern" };
         private static readonly double CompassDirectionPieceDegrees = 360.0 / CompassDirections.Length;
 
-        private static List<PlayerCharacter> PlayerCharactersMatchingRole(MimicryRoleKind mimicryRoleKind)
+        private static List<IPlayerCharacter> IPlayerCharactersMatchingRole(MimicryRoleKind mimicryRoleKind)
         {
-            var playerCharactersMatchingRole = new List<PlayerCharacter>();
+            var playerCharactersMatchingRole = new List<IPlayerCharacter>();
 
-            foreach (GameObject gameObject in Services.Objects)
+            foreach (IGameObject gameObject in Services.Objects)
             {
-                PlayerCharacter? playerCharacter = gameObject as PlayerCharacter;
+                IPlayerCharacter? playerCharacter = gameObject as IPlayerCharacter;
 
                 if (playerCharacter == null || playerCharacter == Services.ClientState.LocalPlayer) {
                     continue;
@@ -33,7 +33,7 @@ namespace MimicryHelper
 
                 if (playerCharacter?.ClassJob.GameData?.Role == (byte) mimicryRoleKind)
                 {
-                    playerCharactersMatchingRole.Add((gameObject as PlayerCharacter)!);
+                    playerCharactersMatchingRole.Add((gameObject as IPlayerCharacter)!);
                 }
             }
 
@@ -45,9 +45,9 @@ namespace MimicryHelper
             return Math.Sqrt(Math.Pow(x2 - x1, 2) + Math.Pow(y2 - y1, 2));
         }
 
-        private static PlayerCharacter? ClosestToLocalPlayer(List<PlayerCharacter> playerCharacters)
+        private static IPlayerCharacter? ClosestToLocalPlayer(List<IPlayerCharacter> playerCharacters)
         {
-            PlayerCharacter? closestPlayer = null;
+            IPlayerCharacter? closestPlayer = null;
 
             Vector3? myPosition = Services.ClientState.LocalPlayer?.Position;
 
@@ -58,7 +58,7 @@ namespace MimicryHelper
 
             double smallestDistanceSoFar = -1;
 
-            foreach (PlayerCharacter playerCharacter in playerCharacters)
+            foreach (IPlayerCharacter playerCharacter in playerCharacters)
             {
                 var distance = GetDistance(playerCharacter.Position.X, playerCharacter.Position.Z, myPosition.Value.X, myPosition.Value.Z);
 
@@ -96,7 +96,7 @@ namespace MimicryHelper
             return PositiveModulo(direction, 360);
         }
 
-        private static String GetRelativeCompassDirection(PlayerCharacter character)
+        private static String GetRelativeCompassDirection(IPlayerCharacter character)
         {
 
             Vector3? myPosition = Services.ClientState.LocalPlayer?.Position;
@@ -113,10 +113,10 @@ namespace MimicryHelper
 
         public void MimicRole(IMimicryRole mimicryRole)
         {
-            var playerCharactersMatchingRole = new List<PlayerCharacter>();
+            var playerCharactersMatchingRole = new List<IPlayerCharacter>();
             foreach (MimicryRoleKind mimicryRoleKind in mimicryRole.RoleKinds)
             {
-                playerCharactersMatchingRole.AddRange(PlayerCharactersMatchingRole(mimicryRoleKind));
+                playerCharactersMatchingRole.AddRange(IPlayerCharactersMatchingRole(mimicryRoleKind));
             }
 
             var closestPlayer = ClosestToLocalPlayer(playerCharactersMatchingRole);
@@ -128,7 +128,7 @@ namespace MimicryHelper
             }
 
             Services.Chat.Print($"Attempting to mimic {closestPlayer.Name} in the {GetRelativeCompassDirection(closestPlayer)} direction...");
-            ActionManager.Instance()->UseAction(ActionType.Action, IMimicryMaster.AethericMimicryActionID, closestPlayer.ObjectId);
+            ActionManager.Instance()->UseAction(ActionType.Action, IMimicryMaster.AethericMimicryActionID, closestPlayer.GameObjectId);
         }
     }
 }
