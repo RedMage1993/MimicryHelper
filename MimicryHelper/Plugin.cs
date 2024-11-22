@@ -3,26 +3,28 @@ using Dalamud.Game.Command;
 using Dalamud.Hooking;
 using Dalamud.Logging;
 using Dalamud.Plugin;
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using System;
 using System.Collections.Generic;
+using static FFXIVClientStructs.FFXIV.Client.Game.ActionManager;
 
 namespace MimicryHelper
 {
     public sealed unsafe class Plugin : IDalamudPlugin
     {
-        public string Name => "Mimicry Helper";
+        public static string Name => "Mimicry Helper";
 
         private const string commandName = "/mimic";
 
         private Configuration Configuration { get; init; }
-        private IMimicryMaster MimicryMaster { get; init; }
+        private Gogo MimicryMaster { get; init; }
         private PluginUI PluginUi { get; init; }
 
-        
+
 
 #if DEBUG
-        private delegate IntPtr UseActionDelegate(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7);
+        private delegate IntPtr UseActionDelegate(ActionManager* actionManager, ActionType actionType, uint actionID, ulong targetID, uint a4, UseActionMode a5, uint a6, bool* a7, bool a8);
 
         private readonly Hook<UseActionDelegate>? useActionHook;
 #endif
@@ -51,14 +53,14 @@ namespace MimicryHelper
 #if DEBUG
             try
             {
-                useActionHook = new Hook<UseActionDelegate>((IntPtr)ActionManager.fpUseAction, UseActionDetour);
-                useActionHook.Enable();
+                useActionHook = Services.GameInteropProvider.HookFromAddress<UseActionDelegate>((IntPtr)ActionManager.MemberFunctionPointers.UseAction, UseActionDetour);
+                useActionHook?.Enable();
 
-                PluginLog.Log("Success");
+                Services.PluginLog.Debug("Success");
             }
             catch (Exception e)
             {
-                PluginLog.Log("Error:\n" + e);
+                Services.PluginLog.Debug("Error:\n" + e);
             }
 #endif
         }
@@ -81,9 +83,9 @@ namespace MimicryHelper
                 { "h", new HealerMimicryRole() }
             };
 
-            if (roleMap.ContainsKey(args))
+            if (roleMap.TryGetValue(args, out IMimicryRole? value))
             {
-                MimicryMaster.MimicRole(roleMap[args]);  
+                MimicryMaster.MimicRole(value);  
             }
             else
             {
@@ -103,16 +105,15 @@ namespace MimicryHelper
         //}
 
 #if DEBUG
-        private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, long targetID, uint a4, uint a5, uint a6, void* a7)
+        // (delegate* unmanaged<ActionManager*, ActionType, uint, ulong, uint, UseActionMode, uint, bool*, bool>)
+        private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, ulong targetID, uint a4, UseActionMode a5, uint a6, bool* a7, bool a8)
         {
-            IPlayerCharacter? playerCharacter = Services.Objects.SearchById((uint) targetID) as IPlayerCharacter;
-
-            if (playerCharacter != null)
+            if (Services.Objects.SearchById((uint)targetID) is IPlayerCharacter playerCharacter && playerCharacter.ClassJob.IsValid)
             {
-                Services.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, role = {playerCharacter.ClassJob.GameData?.Role.ToString() ?? "?"}");
+                Services.Chat.Print($"actionType = {actionType}, actionID = {actionID}, targetID = {targetID}, mode = {a5}, role = {playerCharacter.ClassJob.Value.Role.ToString() ?? "?"}");
             }
 
-            return useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7);
+            return useActionHook!.Original(actionManager, actionType, actionID, targetID, a4, a5, a6, a7, a8);
         }
 #endif
     }

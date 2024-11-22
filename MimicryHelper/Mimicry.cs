@@ -20,9 +20,8 @@ namespace MimicryHelper
 
             foreach (IGameObject gameObject in Services.Objects)
             {
-                IPlayerCharacter? playerCharacter = (IPlayerCharacter)gameObject;
-
-                if (playerCharacter == null || playerCharacter == Services.ClientState.LocalPlayer) {
+                if (gameObject is not IPlayerCharacter playerCharacter || playerCharacter == Services.ClientState.LocalPlayer)
+                {
                     continue;
                 }
 
@@ -123,7 +122,7 @@ namespace MimicryHelper
             }
 
             Services.Chat.Print($"Attempting to mimic {closestPlayer.Name} in the {GetRelativeCompassDirection(closestPlayer)} direction...");
-            ActionManager.Instance()->UseAction(ActionType.Action, IMimicryMaster.AethericMimicryActionID, closestPlayer.GameObjectId);
+            ActionManager.Instance()->UseAction(ActionType.Action, Gogo.AethericMimicryActionID, closestPlayer.GameObjectId);
         }
     }
 }

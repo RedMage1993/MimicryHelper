@@ -11,16 +11,16 @@ namespace MimicryHelper
 
     public sealed class TankMimicryRole : IMimicryRole
     {
-        public List<MimicryRoleKind> RoleKinds { get { return new() { MimicryRoleKind.Tank }; } }
+        public List<MimicryRoleKind> RoleKinds { get { return [MimicryRoleKind.Tank]; } }
     }
 
     public sealed class DpsMimicryRole : IMimicryRole
     {
-        public List<MimicryRoleKind> RoleKinds { get { return new() { MimicryRoleKind.MeleeDps, MimicryRoleKind.RangedDps }; } }
+        public List<MimicryRoleKind> RoleKinds { get { return [MimicryRoleKind.MeleeDps, MimicryRoleKind.RangedDps]; } }
     }
 
     public sealed class HealerMimicryRole : IMimicryRole
     {
-        public List<MimicryRoleKind> RoleKinds { get { return new() { MimicryRoleKind.Healer }; } }
+        public List<MimicryRoleKind> RoleKinds { get { return [MimicryRoleKind.Healer]; } }
     }
 }
