@@ -7,7 +7,7 @@ namespace MimicryHelper
 {
     // It is good to have this be disposable in general, in case you ever need it
     // to do any cleanup
-    class PluginUI : IDisposable
+    class PluginUI(Configuration configuration, Gogo mimicryMaster) : IDisposable
     {
         const float UIWidth = 350;
         const float UIHeight = 75;
@@ -15,9 +15,9 @@ namespace MimicryHelper
         const float UIButtonWidth = 100;
         const float UIButtonHeight = 25;
 
-        private readonly Configuration configuration;
+        private readonly Configuration configuration = configuration;
 
-        private readonly IMimicryMaster mimicryMaster;
+        private readonly Gogo mimicryMaster = mimicryMaster;
 
         // this extra bool exists for ImGui, since you can't ref a property
         private bool visible = false;
@@ -32,13 +32,6 @@ namespace MimicryHelper
         {
             get { return this.settingsVisible; }
             set { this.settingsVisible = value; }
-        }
-
-        // passing in the image here just for simplicity
-        public PluginUI(Configuration configuration, IMimicryMaster mimicryMaster)
-        {
-            this.configuration = configuration;
-            this.mimicryMaster = mimicryMaster;
         }
 
         public void Dispose()

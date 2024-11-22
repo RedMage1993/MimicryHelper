@@ -7,15 +7,10 @@ using System.Numerics;
 
 namespace MimicryHelper
 {
-    public interface IMimicryMaster
+    public sealed unsafe class Gogo
     {
         const uint AethericMimicryActionID = 18322;
 
-        void MimicRole(IMimicryRole mimicryRole);
-    }
-
-    public sealed unsafe class Gogo : IMimicryMaster
-    {
         private static readonly string[] CompassDirections = ["eastern", "northeastern", "northern", "northwestern", "western", "southwestern", "southern", "southeastern"];
         private static readonly double CompassDirectionPieceDegrees = 360.0 / CompassDirections.Length;
 
