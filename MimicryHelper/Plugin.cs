@@ -105,7 +105,6 @@ namespace MimicryHelper
         //}
 
 #if DEBUG
-        // (delegate* unmanaged<ActionManager*, ActionType, uint, ulong, uint, UseActionMode, uint, bool*, bool>)
         private IntPtr UseActionDetour(ActionManager* actionManager, ActionType actionType, uint actionID, ulong targetID, uint a4, UseActionMode a5, uint a6, bool* a7, bool a8)
         {
             if (Services.Objects.SearchById((uint)targetID) is IPlayerCharacter playerCharacter && playerCharacter.ClassJob.IsValid)
