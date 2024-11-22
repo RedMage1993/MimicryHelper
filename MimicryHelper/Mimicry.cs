@@ -31,7 +31,7 @@ namespace MimicryHelper
                     continue;
                 }
 
-                if (playerCharacter?.ClassJob.GameData?.Role == (byte) mimicryRoleKind)
+                if (playerCharacter.ClassJob.IsValid && playerCharacter.ClassJob.Value.Role == (byte) mimicryRoleKind)
                 {
                     playerCharactersMatchingRole.Add((gameObject as IPlayerCharacter)!);
                 }
