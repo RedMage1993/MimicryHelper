@@ -16,7 +16,7 @@ namespace MimicryHelper
 
     public sealed unsafe class Gogo : IMimicryMaster
     {
-        private static readonly string[] CompassDirections = { "eastern", "northeastern", "northern", "northwestern", "western", "southwestern", "southern", "southeastern" };
+        private static readonly string[] CompassDirections = ["eastern", "northeastern", "northern", "northwestern", "western", "southwestern", "southern", "southeastern"];
         private static readonly double CompassDirectionPieceDegrees = 360.0 / CompassDirections.Length;
 
         private static List<IPlayerCharacter> IPlayerCharactersMatchingRole(MimicryRoleKind mimicryRoleKind)
@@ -25,7 +25,7 @@ namespace MimicryHelper
 
             foreach (IGameObject gameObject in Services.Objects)
             {
-                IPlayerCharacter? playerCharacter = gameObject as IPlayerCharacter;
+                IPlayerCharacter? playerCharacter = (IPlayerCharacter)gameObject;
 
                 if (playerCharacter == null || playerCharacter == Services.ClientState.LocalPlayer) {
                     continue;
