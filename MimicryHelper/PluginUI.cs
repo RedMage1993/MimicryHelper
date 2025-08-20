@@ -1,5 +1,5 @@
 ﻿
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System;
 using System.Numerics;
 
