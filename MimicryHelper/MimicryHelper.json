@@ -2,7 +2,7 @@
   "Author": "RedMage1993",
   "Name": "Mimicry Helper",
   "Punchline": "Automatically mimic the role you're looking for.",
-  "Description": "Use /mimic to open up the menu and click on the appropriate button to automatically mimic the role you're looking for.",
+  "Description": "Use /mimic to open up the menu and click on a role to mimic. You may also use d, h, or t in the command, e.g. /mimic d.",
   "InternalName": "mimicryHelper",
   "ApplicableVersion": "any",
   "Tags": [
