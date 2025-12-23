@@ -34,6 +34,11 @@
 	<Content Include="..\images\icon.png" Link="images\icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="DalamudPackager" Version="14.0.1" />
+    <PackageReference Update="DotNet.ReproducibleBuilds" Version="1.2.39" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">
 	<DalamudLibPath>$(DALAMUD_HOME)/</DalamudLibPath>
   </PropertyGroup>
