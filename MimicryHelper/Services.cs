@@ -22,9 +22,6 @@ namespace MimicryHelper
         public static IObjectTable Objects { get; private set; } = null!;
 
         [PluginService]
-        public static IClientState ClientState { get; private set; } = null!;
-
-        [PluginService]
         public static IChatGui Chat { get; private set; } = null!;
 
         [PluginService]

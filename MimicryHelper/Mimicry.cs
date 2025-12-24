@@ -20,7 +20,7 @@ namespace MimicryHelper
 
             foreach (IGameObject gameObject in Services.Objects)
             {
-                if (gameObject is not IPlayerCharacter playerCharacter || playerCharacter == Services.ClientState.LocalPlayer)
+                if (gameObject is not IPlayerCharacter playerCharacter || playerCharacter == Services.Objects.LocalPlayer)
                 {
                     continue;
                 }
@@ -43,7 +43,7 @@ namespace MimicryHelper
         {
             IPlayerCharacter? closestPlayer = null;
 
-            Vector3? myPosition = Services.ClientState.LocalPlayer?.Position;
+            Vector3? myPosition = Services.Objects.LocalPlayer?.Position;
 
             if (myPosition == null)
             {
@@ -93,7 +93,7 @@ namespace MimicryHelper
         private static String GetRelativeCompassDirection(IPlayerCharacter character)
         {
 
-            Vector3? myPosition = Services.ClientState.LocalPlayer?.Position;
+            Vector3? myPosition = Services.Objects.LocalPlayer?.Position;
 
             if (myPosition == null)
             {
